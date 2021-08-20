@@ -15,7 +15,7 @@ import { CountryService } from '../../services/country.service';
 export class DisasterTypeComponent implements OnInit, OnDestroy {
   public disasterTypes: DisasterType[] = [];
   public disasterTypeMap = DISASTER_TYPES_SVG_MAP;
-  public selectedDisasterType: DisasterTypeKey;
+  public selectedDisasterType: DisasterTypeKey = DisasterTypeKey.floods;
 
   private countrySubscription: Subscription;
 
@@ -38,13 +38,14 @@ export class DisasterTypeComponent implements OnInit, OnDestroy {
   private onCountryChange = (country: Country) => {
     if (country) {
       this.disasterTypes = country.disasterTypes;
-      this.selectedDisasterType = this.disasterTypes[0].disasterType;
+      this.disasterTypes.forEach(disasterType => {
+        this.eventService.getTriggerByDisasterType(country.countryCodeISO3, disasterType);
+      });
     }
   };
 
   public switchDisasterType(disasterType: DisasterType): void {
     this.disasterTypeService.setDisasterType(disasterType);
     this.selectedDisasterType = disasterType.disasterType;
-    console.log('', this.eventService.state.activeTrigger);
   }
 }

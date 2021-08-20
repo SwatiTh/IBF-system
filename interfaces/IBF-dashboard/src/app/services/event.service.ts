@@ -28,7 +28,6 @@ export class EventService {
     firstLeadTime: null,
     firstLeadTimeLabel: null,
     firstLeadTimeName: null,
-    timeUnit: null,
   };
 
   constructor(
@@ -63,6 +62,18 @@ export class EventService {
         .subscribe(this.onEvent);
     }
   }
+
+  public getTriggerByDisasterType(country: string, disasterType: DisasterType) {
+    if (country && disasterType) {
+      this.apiService
+        .getEvent(country, disasterType.disasterType)
+        .subscribe(this.onGetDisasterTypeEvent(disasterType));
+    }
+  }
+
+  private onGetDisasterTypeEvent = (disasterType: DisasterType) => (event) => {
+    disasterType.activeTrigger = event.activeTrigger || false
+  };
 
   private onEvent = (event) => {
     this.state.event = event;
@@ -162,13 +173,10 @@ export class EventService {
           LeadTimeTriggerKey[leadTime] >=
             LeadTimeTriggerKey[this.state.firstLeadTime]
         ) {
-          triggerLeadTime = leadTime;
+          triggerLeadTime = LeadTimeTriggerKey[leadTime];
         }
       });
-      this.state.triggerLeadTime = LeadTimeTriggerKey[triggerLeadTime];
-      this.state.timeUnit = triggerLeadTime.split('-')[1];
+      this.state.triggerLeadTime = triggerLeadTime;
     }
   }
-
-  public isOldEvent = () => this.state.activeEvent && !this.state.activeTrigger;
 }
